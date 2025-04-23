@@ -91,7 +91,7 @@ export const App = () => {
   const handleStartPlacing = (sticker) => {
     if (transformRef.current) {
       const { positionX, positionY } = transformRef.current.state;
-      transformRef.current.setTransform(positionX - 100, positionY - 100, 1); // sadece scale = 1 yap
+      transformRef.current.setTransform(positionX, positionY, 1); // sadece scale = 1 yap
     }
     setSelectedSticker(sticker);
     setPlacingMode(true);
