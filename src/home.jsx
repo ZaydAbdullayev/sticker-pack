@@ -1,3 +1,4 @@
+// GÜNCELLENMİŞ: SCALE=1 MERKEZ KORUNARAK YAPILDI & TIKLAMA İLE STICKER EKLEME
 import { useEffect, useRef, useState } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import "./home.scss";
@@ -25,6 +26,7 @@ export const App = () => {
     message: "",
   });
   const [placingMode, setPlacingMode] = useState(false);
+  const [ghostPos, setGhostPos] = useState({ x: 1400, y: 1000 });
   const wrapperRef = useRef(null);
   const [scale, setScale] = useState(null);
   const transformRef = useRef(null);
@@ -72,7 +74,8 @@ export const App = () => {
       x,
       y,
     };
-    setStickers([...stickers, newSticker]);
+    const updated = [...stickers, newSticker];
+    setStickers(updated);
     setPlacingMode(false);
     setSelectedSticker(null);
     setForm({
@@ -82,19 +85,26 @@ export const App = () => {
       size: "middle",
       message: "",
     });
-    localStorage.setItem(
-      "stickerPack",
-      JSON.stringify([...stickers, newSticker])
-    );
+    localStorage.setItem("stickerPack", JSON.stringify(updated));
   };
 
   const handleStartPlacing = (sticker) => {
     if (transformRef.current) {
       const { positionX, positionY } = transformRef.current.state;
-      transformRef.current.setTransform(positionX, positionY, 1); // sadece scale = 1 yap
+      transformRef.current.setTransform(positionX, positionY, 1);
     }
+    setGhostPos({ x: 1400, y: 1000 });
     setSelectedSticker(sticker);
     setPlacingMode(true);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!placingMode || !selectedSticker) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const size = sizes[selectedSticker.size];
+    setGhostPos({ x: x + size / 2, y: y + size / 2 });
   };
 
   const saveStickerToSession = () => {
@@ -263,11 +273,15 @@ export const App = () => {
             initialPositionX={0}
             initialPositionY={0}
             doubleClick={{ disabled: true }}
+            panning={{ disabled: placingMode }}
+            wheel={{ disabled: placingMode }}
+            pinch={{ disabled: placingMode }}
           >
             <TransformComponent>
               <div
                 className="sticker-wall"
-                onDoubleClick={handleWallClick}
+                onMouseMove={handleMouseMove}
+                onClick={handleWallClick}
                 style={{ width: 3000, height: 2000 }}
               >
                 {stickers.map((s) => {
@@ -309,6 +323,50 @@ export const App = () => {
                     </div>
                   );
                 })}
+
+                {placingMode && selectedSticker && (
+                  <div
+                    className={`sticker ghost ${selectedSticker.shape}`}
+                    style={{
+                      backgroundColor:
+                        selectedSticker.shape === "triangle"
+                          ? "transparent"
+                          : selectedSticker.bgColor,
+                      color: selectedSticker.textColor,
+                      width:
+                        selectedSticker.shape === "rectangle"
+                          ? `${sizes[selectedSticker.size] * 2}px`
+                          : `${sizes[selectedSticker.size]}px`,
+                      height: `${sizes[selectedSticker.size]}px`,
+                      left: ghostPos.x,
+                      top: ghostPos.y,
+                      position: "absolute",
+                      transform: "translate(-50%, -50%)",
+                      pointerEvents: "none",
+                      opacity: 0.5,
+                      border: "2px dashed #fff",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {selectedSticker.shape === "rhombus" ? (
+                      <span
+                        style={{
+                          transform: "rotate(-45deg)",
+                          display: "inline-block",
+                          width: "100%",
+                          textAlign: "center",
+                        }}
+                      >
+                        {selectedSticker.message}
+                      </span>
+                    ) : (
+                      selectedSticker.message
+                    )}
+                  </div>
+                )}
               </div>
             </TransformComponent>
           </TransformWrapper>
