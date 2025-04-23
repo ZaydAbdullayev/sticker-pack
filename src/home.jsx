@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import "./home.scss";
+import { RiTwitterXFill } from "react-icons/ri";
 
 const shapes = ["square", "rectangle", "circle", "rhombus"];
 const bgColors = ["#FFD700", "#FF6347", "#87CEEB", "#FFFFFF"];
@@ -89,10 +90,23 @@ export const App = () => {
   };
 
   const handleStartPlacing = (sticker) => {
-    if (transformRef.current) {
-      const { positionX, positionY } = transformRef.current.state;
-      transformRef.current.setTransform(positionX, positionY, 1);
+    if (transformRef.current && wrapperRef.current) {
+      const {
+        positionX,
+        positionY,
+        scale: currentScale,
+      } = transformRef.current.state;
+      const rect = wrapperRef.current.getBoundingClientRect();
+
+      const centerX = -positionX + rect.width / 2;
+      const centerY = -positionY + rect.height / 2;
+
+      const newX = -(centerX * (1 / currentScale)) + rect.width / 2;
+      const newY = -(centerY * (1 / currentScale)) + rect.height / 2;
+
+      transformRef.current.setTransform(newX, newY, 1);
     }
+
     setGhostPos({ x: 1400, y: 1000 });
     setSelectedSticker(sticker);
     setPlacingMode(true);
@@ -125,6 +139,14 @@ export const App = () => {
 
   return (
     <div className="sticker-container">
+      <a
+        href="https://x.com/solonwall"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="contact-link"
+      >
+        <RiTwitterXFill />
+      </a>
       <div className="header">
         <h1 className="title">Memorial Wall</h1>
         <p className="description">
