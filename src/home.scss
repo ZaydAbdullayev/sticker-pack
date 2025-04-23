@@ -384,8 +384,9 @@
   width: 90vw;
   height: 75vh;
   max-width: 100%;
-  background: radial-gradient(circle at 50% 50%, #ffd70090, #000);
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  background-image: url("./assets/bg.png");
+  background-size: contain;
 }
 
 .sticker-wall {
@@ -406,9 +407,6 @@
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
   padding: 5px;
   word-break: break-word;
-}
-
-.sticker.rectangle {
 }
 
 .sticker.rhombus {

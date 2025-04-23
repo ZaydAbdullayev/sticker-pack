@@ -1,5 +1,5 @@
 // GÜNCELLENMİŞ: SCALE=1 MERKEZ KORUNARAK YAPILDI & TIKLAMA İLE STICKER EKLEME
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import "./home.scss";
 import { RiTwitterXFill } from "react-icons/ri";
@@ -148,7 +148,7 @@ export const App = () => {
         <RiTwitterXFill />
       </a>
       <div className="header">
-        <h1 className="title">Memorial Wall</h1>
+        <h1 className="title">Wall of Sol </h1>
         <p className="description">
           Create your own stickers and place them on the wall. Double-click to
           place a sticker.
@@ -164,9 +164,8 @@ export const App = () => {
               <div
                 key={i}
                 onClick={() => handleStartPlacing(s)}
-                className={`sticker-preview ${s.shape} ${
-                  selectedSticker === s ? "active" : ""
-                }`}
+                className={`sticker-preview ${s.shape} ${selectedSticker === s ? "active" : ""
+                  }`}
                 style={{
                   backgroundColor: s.bgColor,
                   color: s.textColor,
@@ -288,14 +287,16 @@ export const App = () => {
         {scale !== null && (
           <TransformWrapper
             ref={transformRef}
-            minScale={0.1}
+            minScale={scale}
             initialScale={scale}
             limitToBounds={false}
             onInit={(utils) => (transformRef.current = utils)}
             initialPositionX={0}
             initialPositionY={0}
             doubleClick={{ disabled: true }}
-            panning={{ disabled: placingMode }}
+            panning={{
+              disabled: placingMode,
+            }}
             wheel={{ disabled: placingMode }}
             pinch={{ disabled: placingMode }}
           >
