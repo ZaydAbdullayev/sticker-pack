@@ -1,5 +1,5 @@
 // GÜNCELLENMİŞ: SCALE=1 MERKEZ KORUNARAK YAPILDI & TIKLAMA İLE STICKER EKLEME
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import "./home.scss";
 import { RiTwitterXFill } from "react-icons/ri";
@@ -30,6 +30,7 @@ export const App = () => {
   const [ghostPos, setGhostPos] = useState({ x: 1400, y: 1000 });
   const wrapperRef = useRef(null);
   const [scale, setScale] = useState(null);
+  const [panning, setPanning] = useState(true);
   const transformRef = useRef(null);
 
   useEffect(() => {
@@ -295,10 +296,19 @@ export const App = () => {
             initialPositionY={0}
             doubleClick={{ disabled: true }}
             panning={{
-              disabled: placingMode,
+              disabled: panning || placingMode,
             }}
             wheel={{ disabled: placingMode }}
             pinch={{ disabled: placingMode }}
+            onZoom={({ state }, _) => {
+              console.log("Zooming", state?.scale);
+              if (state?.scale > scale) {
+                setPanning(false);
+              } else {
+                setPanning(true);
+                transformRef.current.setTransform(0, 0, scale);
+              }
+            }}
           >
             <TransformComponent>
               <div
